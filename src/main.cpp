@@ -14,14 +14,21 @@ int main() {
         line.add(x, std::sin(x));
     }
 
-    plot.write("plots/generation_001.svg"); // Gera arquivo SVG
-    plot.write("plots/generation_002.svg"); // Gera arquivo SVG
-    plot.write("plots/generation_003.svg"); // Gera arquivo SVG
+    
+
+    plot.write("plots/gen_001.svg"); // Gera arquivo SVG
+    plot.write("plots/gen_002.svg"); // Gera arquivo SVG
+    plot.write("plots/gen_003.svg"); // Gera arquivo SVG
 
 
-    std::string cmd = 
-        "ffmpeg -y -framerate 10 -pattern_type glob -i plots/gen_*.svg\" "
-        "-pix_fmt yuv420p plots/evolution.mp4";
+    // Usa PNG e nomes numerados (gen_000.png, gen_001.png, ...)
+
+    std::string frames_folder = "plots";
+
+    std::string cmd =
+        "ffmpeg -y -framerate 2 -i \"" + frames_folder +
+        "/gen_%03d.svg\" -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" "
+        "-c:v libx264 -pix_fmt yuv420p " + frames_folder + "/evolution.mp4";
 
     std::cout << "Gerando vídeo com FFmpeg...\n";
     int result = std::system(cmd.c_str());
