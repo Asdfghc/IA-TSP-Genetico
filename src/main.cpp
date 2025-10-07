@@ -1,41 +1,37 @@
 #include <cstdlib>
 #include <iostream>
-#include <filesystem>
+#include <vector>
 #include "plot.h"
+#include "individual.h"
+#include "population.h"
+
+using namespace std;
 
 int main() {
-    signalsmith::plot::Plot2D plot;
-    plot.title("Função Seno");
-    plot.x.label("x");
-    plot.y.label("sin(x)");
+    vector<Point> cities = { {1.5, 2.3, "A"}, {3.5, 13.1, "B"}, {13.3, 14.5, "C"}, {12.0, 2.2, "D"} };
 
-    auto &line = plot.line();
-    for (double x = 0; x < 6.28; x += 0.01) {
-        line.add(x, std::sin(x));
+    Population population(10);
+    population.initialize(cities);
+
+    //Individual individual = population.getIndividuals().front();
+
+    signalsmith::plot::Plot2D plot;
+    plot.x.linear(0, 17).majors(0).minors(17);
+    plot.y.linear(0, 15).majors(0).minors(15);
+    auto& line = plot.line();
+
+    for (int i = 0; i < 10; i++) {
+        Individual individual = population.getIndividuals().at(i);
+        for (const auto& point : individual.getPath()) {
+            line.add(point.x, point.y);
+            line.marker(point.x, point.y);
+            line.label(point.x - 1, point.y - 1, point.name);
+        }
+        line.add(individual.getPath().front().x, individual.getPath().front().y); // Fecha o ciclo
+        plot.toFrame(i * 0.5); // Adiciona um frame a cada 0.5 segundos
     }
 
-    
-
-    plot.write("plots/gen_001.svg"); // Gera arquivo SVG
-    plot.write("plots/gen_002.svg"); // Gera arquivo SVG
-    plot.write("plots/gen_003.svg"); // Gera arquivo SVG
-
-
-    // Usa PNG e nomes numerados (gen_000.png, gen_001.png, ...)
-
-    std::string frames_folder = "plots";
-
-    std::string cmd =
-        "ffmpeg -y -framerate 2 -i \"" + frames_folder +
-        "/gen_%03d.svg\" -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" "
-        "-c:v libx264 -pix_fmt yuv420p " + frames_folder + "/evolution.mp4";
-
-    std::cout << "Gerando vídeo com FFmpeg...\n";
-    int result = std::system(cmd.c_str());
-    if (result == 0)
-        std::cout << "✅ Vídeo gerado com sucesso!\n";
-    else
-        std::cerr << "❌ Erro ao executar FFmpeg (código " << result << ")\n";
+    plot.write("plots/evolution.svg"); // Gera arquivo SVG
 
     return 0;
 }
