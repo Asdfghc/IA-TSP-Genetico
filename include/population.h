@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <random>
 #include "individual.h"
+#include "utils.h"
 
 using namespace std;
 
@@ -20,6 +21,12 @@ public:
     }
 
     vector<Individual> getIndividuals() const { return individuals; }
+
+    void insert(vector<Individual> individuals) {
+        for (const auto& ind : individuals) {
+            this->individuals.emplace_back(ind);
+        }
+    }
 
     void initialize(const vector<Point>& cities) {
         individuals.clear();
@@ -38,26 +45,31 @@ public:
     }
 
     void evaluateFitness() {
-        for (int i = 0; i < populationSize; i++) 
+        fitnessValues.clear();
+        for (int i = 0; i < individuals.size(); i++)
             fitnessValues.emplace_back(individuals.at(i).getTotalDistance());
         double maxDistance = *max_element(fitnessValues.begin(), fitnessValues.end());
-        for (int i = 0; i < populationSize; i++) {
+        for (int i = 0; i < individuals.size(); i++) {
             fitnessValues.at(i) = maxDistance - fitnessValues.at(i);
         }
         double fitnessSum = accumulate(fitnessValues.begin(), fitnessValues.end(), 0.0);
-        for (int i = 0; i < populationSize; i++) {
-            double normalizedFitness = fitnessValues.at(i) / fitnessSum;
-            fitnessValues.emplace_back(normalizedFitness);
+        if (fitnessSum == 0) fitnessSum = 1; // Evita divisão por zero
+        for (int i = 0; i < individuals.size(); i++) {
+            fitnessValues.at(i) /= fitnessSum;
         }
     }
 
-    Individual roulette() {
-        vector<double> fitnessCumsum;
-        partial_sum(fitnessValues.begin(), fitnessValues.end(), back_inserter(fitnessCumsum));
-        random_device rd;
-        mt19937 gen(rd());
-        double r = uniform_real_distribution<>(0, fitnessCumsum.back())(gen);
-        auto it = lower_bound(fitnessCumsum.begin(), fitnessCumsum.end(), r);
-        return individuals.at(distance(fitnessCumsum.begin(), it));
+    void select(int populationSize) {
+        sort(individuals.begin(), individuals.end(), [&](Individual a, Individual b) {
+            return a.getTotalDistance() < b.getTotalDistance();
+        });
+        if (individuals.size() > populationSize)
+            individuals.erase(individuals.begin() + populationSize, individuals.end());
+    }
+
+    Individual getBestIndividual() {
+        auto minIt = min_element(fitnessValues.begin(), fitnessValues.end());
+        int index = distance(fitnessValues.begin(), minIt);
+        return individuals.at(index);
     }
 };
