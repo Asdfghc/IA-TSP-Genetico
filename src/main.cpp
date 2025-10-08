@@ -28,9 +28,9 @@ int main() {
             Individual parent1 = roulette(population.getIndividuals(), population.fitnessValues);
             Individual parent2 = roulette(population.getIndividuals(), population.fitnessValues);
             for (Individual child : crossover(parent1, parent2)) {
+                mutate(child, mutationRate);
                 offspring.push_back(child);
             }
-            //mutate(child, mutationRate);
         }
         population.insert(offspring);
         // print population before selection
@@ -66,13 +66,25 @@ int main() {
         line.add(bestIndividual.getPath().front().x, bestIndividual.getPath().front().y); // Fecha o ciclo
         //plot.toFrame(j * 0.5); // Adiciona um frame a cada 0.5 segundos
 
+        plot.title("Generation " + to_string(i + 1) + " - Distance: " + to_string(bestIndividual.getTotalDistance()));
         plot.write("plots/individual_" + to_string(i) + ".svg"); // Gera arquivo SVG para cada indivíduo
-        //cout << population.fitnessValues.at(i) << endl; // Imprime a aptidão do indivíduo
     }
-
-    
-
     //plot.write("plots/evolution.svg"); // Gera arquivo SVG
+
+    std::string frames_folder = "plots";
+
+    std::string cmd =
+        "ffmpeg -y -framerate 2 -i \"" + frames_folder +
+        "/individual_%03d.svg\" -vf \"scale=trunc(iw/2)*2:trunc(ih/2)*2\" "
+        "-c:v libx264 -pix_fmt yuv420p " + frames_folder + "/evolution.mp4";
+
+    std::cout << "Gerando vídeo com FFmpeg...\n";
+    int result = std::system(cmd.c_str());
+    if (result == 0)
+        std::cout << "✅ Vídeo gerado com sucesso!\n";
+    else
+        std::cerr << "❌ Erro ao executar FFmpeg (código " << result << ")\n";
+
 
     return 0;
 }

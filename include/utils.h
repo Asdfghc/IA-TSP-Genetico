@@ -65,3 +65,17 @@ vector<Individual> crossover(Individual parent1, Individual parent2) {
     
     return offspring;
 }
+
+void mutate(Individual& individual, double mutationRate) {
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_real_distribution<> dis(0, 1);
+    if (dis(gen) < mutationRate) {
+        vector<Point> path = individual.getPath();
+        int n_cities = (int)path.size();
+        int idx1 = uniform_int_distribution<>(0, n_cities - 1)(gen);
+        int idx2 = uniform_int_distribution<>(0, n_cities - 1)(gen);
+        swap(path[idx1], path[idx2]);
+        individual = Individual(path);
+    }
+}
