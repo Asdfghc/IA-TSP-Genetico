@@ -8,19 +8,20 @@
 using namespace std;
 
 int main() {
-    vector<Point> cities = { {1.5, 2.3, "A"}, {3.5, 13.1, "B"}, {13.3, 14.5, "C"}, {12.0, 2.2, "D"} };
+    vector<Point> cities = { {1.5, 2.3, "A"}, {3.5, 13.1, "B"}, {13.3, 14.5, "C"}, {12.0, 2.2, "D"}, {7.5, 8.8, "E"},
+                             {9.0, 1.5, "F"}, {6.4, 5.5, "G"} };
 
     Population population(10);
     population.initialize(cities);
+    population.evaluateFitness();
 
-    //Individual individual = population.getIndividuals().front();
-
-    signalsmith::plot::Plot2D plot;
-    plot.x.linear(0, 17).majors(0).minors(17);
-    plot.y.linear(0, 15).majors(0).minors(15);
-    auto& line = plot.line();
-
+    
     for (int i = 0; i < 10; i++) {
+        signalsmith::plot::Plot2D plot;
+        plot.x.linear(0, 17).majors(0).minors(17);
+        plot.y.linear(0, 17).majors(0).minors(17);
+        auto& line = plot.line();
+
         Individual individual = population.getIndividuals().at(i);
         for (const auto& point : individual.getPath()) {
             line.add(point.x, point.y);
@@ -28,10 +29,13 @@ int main() {
             line.label(point.x - 1, point.y - 1, point.name);
         }
         line.add(individual.getPath().front().x, individual.getPath().front().y); // Fecha o ciclo
-        plot.toFrame(i * 0.5); // Adiciona um frame a cada 0.5 segundos
+        //plot.toFrame(i * 0.5); // Adiciona um frame a cada 0.5 segundos
+        
+        plot.write("plots/individual_" + to_string(i) + ".svg"); // Gera arquivo SVG para cada indivíduo
+        cout << population.fitnessValues.at(i) << endl; // Imprime a aptidão do indivíduo
     }
 
-    plot.write("plots/evolution.svg"); // Gera arquivo SVG
+    //plot.write("plots/evolution.svg"); // Gera arquivo SVG
 
     return 0;
 }
