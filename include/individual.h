@@ -3,34 +3,23 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include "point.h"
 
 using namespace std;
-
-struct Point {
-    double x, y;
-    string name;
-};
 
 class Individual {
 private:
     vector<Point> path;
 
-    double distance(const Point& a, const Point& b) {
-        return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
-    }
+    double distance(const Point& a, const Point& b) const;
 
 public:
-    Individual(const vector<Point>& path) : path(path) {}
+    Individual(const vector<Point>& path);
+    const vector<Point>& getPath() const;
+    double getTotalDistance() const;
+    
+    void mutate(double mutationRate);
 
-    vector<Point> getPath() const { return path; }
-
-    double getTotalDistance() {
-        double total = 0.0;
-        for (size_t i = 0; i < path.size() - 1; ++i) {
-            total += distance(path[i], path[i + 1]);
-        }
-        total += distance(path.back(), path.front()); // Return to start
-        return total;
-    }
+    static pair<Individual, Individual> crossover(const Individual& parent1, const Individual& parent2);
 
 };

@@ -5,30 +5,16 @@
 #include "plot.h"
 #include "individual.h"
 #include "population.h"
+#include "utils.h"
 
 using namespace std;
 
 int main() {
-    // Limpa a pasta de plots
-    string plots_folder = "plots";
-    if (!filesystem::exists(plots_folder)) {
-        filesystem::create_directory(plots_folder);
-    } else {
-        for (const auto& entry : filesystem::directory_iterator(plots_folder)) {
-            filesystem::remove_all(entry.path());
-        }
-    }
-    plots_folder = "plots/individual";
-    if (!filesystem::exists(plots_folder)) {
-        filesystem::create_directory(plots_folder);
-    } else {
-        for (const auto& entry : filesystem::directory_iterator(plots_folder)) {
-            filesystem::remove_all(entry.path());
-        }
-    }
+    clearPlots();
 
     vector<Point> cities = { {1.5, 2.3, "A"}, {3.5, 13.1, "B"}, {13.3, 14.5, "C"}, {12.0, 2.2, "D"}, {7.5, 8.8, "E"},
                              {9.0, 1.5, "F"}, {6.4, 5.5, "G"} };
+    
     int populationSize = 100;
     double crossoverRate = 0.7;
     double mutationRate = 0.3;
@@ -38,42 +24,17 @@ int main() {
     population.initialize(cities);
     
     for (int i = 0; i < generations; i++) {
-        //cout << "Generation " << i + 1 << ":\n";
 
-        vector<Individual> offspring;
-        offspring.reserve((int)(populationSize * crossoverRate));
         for (int j = 0; j < populationSize * crossoverRate; j++) {
             population.evaluateFitness();
-            Individual parent1 = roulette(population.getIndividuals(), population.fitnessValues);
-            Individual parent2 = roulette(population.getIndividuals(), population.fitnessValues);
-            for (Individual child : crossover(parent1, parent2)) {
-                mutate(child, mutationRate);
-                offspring.push_back(child);
-            }
+            Individual parent1 = population.roulette();
+            Individual parent2 = population.roulette();
+            auto children = Individual::crossover(parent1, parent2);
+            population.insertIndividuals(children);
         }
-        population.insert(offspring);
-
-        /*
-        // print population before selection
-        cout << "Population before selection:\n";
-        for (Individual ind : population.getIndividuals()) {
-            for (const auto& city : ind.getPath()) {
-                printf("%s ", city.name.c_str());
-            }
-            printf(" | Distance: %.2f\n", ind.getTotalDistance());
-        }
-        */
         population.select(populationSize);
-        /*
-        // print population after selection
-        cout << "Population after selection:\n";
-        for (Individual ind : population.getIndividuals()) {
-            for (const auto& city : ind.getPath()) {
-                printf("%s ", city.name.c_str());
-            }
-            printf(" | Distance: %.2f\n", ind.getTotalDistance());
-        }
-        */
+
+        // --- Gráficos ---
 
         signalsmith::plot::Plot2D plot(500, 400);
         plot.x.linear(0, 17).majors(0).minors(17);
@@ -85,7 +46,7 @@ int main() {
         for (const auto& point : bestIndividual.getPath()) {
             line.add(point.x, point.y);
             line.marker(point.x, point.y);
-            line.label(point.x - 0.7, point.y - 0.7, point.name);
+            line.label(point.x - 0.5, point.y - 0.7, point.name);
         }
         line.add(bestIndividual.getPath().front().x, bestIndividual.getPath().front().y); // Fecha o ciclo
         //plot.toFrame(j * 0.5); // Adiciona um frame a cada 0.5 segundos
@@ -97,20 +58,8 @@ int main() {
     }
     //plot.write("plots/evolution.svg"); // Gera arquivo SVG
 
-    // --- Gera vídeo a partir dos arquivos SVG usando FFmpeg ---
-
-    string frames_folder = "plots";
-
-    string cmd =
-        "ffmpeg -y -i plots/individual/gen_%03d.svg -vf palettegen plots/palette.png -nostats -loglevel 0 && "
-        "ffmpeg -y -framerate 2 -i plots/individual/gen_%03d.svg -i plots/palette.png -lavfi paletteuse plots/evolution.gif -nostats -loglevel 0";
-
-    cout << "Gerando gif com FFmpeg...\n";
-    int result = system(cmd.c_str());
-    if (result == 0)
-        cout << "Gif gerado com sucesso!\n";
-    else
-        cerr << "Erro ao executar FFmpeg (código " << result << ")\n";
+    createGif();
+    createVideo();
 
     return 0;
 }
