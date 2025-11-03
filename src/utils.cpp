@@ -5,9 +5,48 @@
 #include <numeric>
 #include <string>
 #include <cstdlib>
+#include <cmath>
+#include <sstream>
+#include <iomanip>
 #include "utils.h"
 #include "individual.h"
 #include "point.h"
+
+vector<Point> generateUniformPoints(int n, double xmin, double xmax, double ymin, double ymax) {
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_real_distribution <> dx(xmin, xmax);
+    uniform_real_distribution <> dy(ymin, ymax);
+
+    vector<Point> points;
+
+    for (int i = 0; i < n; i++) {
+        ostringstream name;
+        name << "P" << i;
+        points.push_back({dx(gen),dy(gen),name.str()});
+    }
+
+    return points;
+}
+
+vector<Point> generateUniformPoints(int n, double cx, double cy, double radius) {
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_real_distribution <> ang(0,2 * M_PI);
+
+    vector<Point> points;
+    for(int i = 0; i < n; i++) {
+        double theta = 2 * M_PI * i/n;
+        double x = cx + radius * cos(theta);
+        double y = cy + radius * sin(theta);
+        ostringstream name;
+        name << "C" << i;
+        points.push_back({x, y, name.str()});
+    }
+
+    return points;
+    
+}
 
 void clearPlots() {
     string plots_folder = "plots";

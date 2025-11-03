@@ -12,13 +12,22 @@ using namespace std;
 int main() {
     clearPlots();
 
-    vector<Point> cities = { {1.5, 2.3, "A"}, {3.5, 13.1, "B"}, {13.3, 14.5, "C"}, {12.0, 2.2, "D"}, {7.5, 8.8, "E"},
-                             {9.0, 1.5, "F"}, {6.4, 5.5, "G"} };
-    
     int populationSize = 100;
     double crossoverRate = 0.7;
     double mutationRate = 0.3;
-    int generations = 15;
+    int generations = 30;
+
+    vector<Point> cities;
+
+    // Switch de circle para pontos uniformes
+    bool circle = false;
+
+    if(circle) {
+        cities = generateCirclePoints(50);
+        generations = 40;
+    } else {
+        cities = generateUniformPoints(10);
+    }
 
     Population population(populationSize);
     population.initialize(cities);
