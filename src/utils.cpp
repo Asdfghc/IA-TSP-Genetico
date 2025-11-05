@@ -12,6 +12,10 @@
 #include "individual.h"
 #include "point.h"
 
+using namespace std;
+
+constexpr double PI = std::acos(-1.0);
+
 vector<Point> generateUniformPoints(int n, double xmin, double xmax, double ymin, double ymax) {
     random_device rd;
     mt19937 gen(rd());
@@ -29,23 +33,17 @@ vector<Point> generateUniformPoints(int n, double xmin, double xmax, double ymin
     return points;
 }
 
-vector<Point> generateUniformPoints(int n, double cx, double cy, double radius) {
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_real_distribution <> ang(0,2 * M_PI);
-
+vector<Point> generateCirclePoints(int n, double cx, double cy, double radius) {
     vector<Point> points;
-    for(int i = 0; i < n; i++) {
-        double theta = 2 * M_PI * i/n;
+    for (int i = 0; i < n; i++) {
+        double theta = 2 * PI * i / n;
         double x = cx + radius * cos(theta);
         double y = cy + radius * sin(theta);
         ostringstream name;
         name << "C" << i;
         points.push_back({x, y, name.str()});
     }
-
     return points;
-    
 }
 
 void clearPlots() {

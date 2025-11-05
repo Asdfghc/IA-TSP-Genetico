@@ -15,18 +15,19 @@ int main() {
     int populationSize = 100;
     double crossoverRate = 0.7;
     double mutationRate = 0.3;
-    int generations = 30;
+    int generations = 100;
 
     vector<Point> cities;
 
     // Switch de circle para pontos uniformes
-    bool circle = false;
+    bool circle = true;
 
-    if(circle) {
-        cities = generateCirclePoints(50);
-        generations = 40;
+    if (circle) {
+        cities = generateCirclePoints(20, 8.0, 8.0, 6.0);
+        generations = 100;
     } else {
-        cities = generateUniformPoints(10);
+        cities = generateUniformPoints(100);
+        generations = 100;
     }
 
     Population population(populationSize);
@@ -39,6 +40,8 @@ int main() {
             Individual parent1 = population.roulette();
             Individual parent2 = population.roulette();
             auto children = Individual::crossover(parent1, parent2);
+            children.first.mutate(mutationRate);
+            children.second.mutate(mutationRate);
             population.insertIndividuals(children);
         }
         population.select(populationSize);
