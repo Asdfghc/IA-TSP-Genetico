@@ -60,7 +60,7 @@ Foram utilizados **C++** para o algoritmo e **Signalsmith Plot** + **FFmpeg** pa
 |      75 |           78.9  |            74.2  |        540 |
 |     100 | **75.6**        | **71.1**         |        720 |
 
-![Solução final – 20 cidades uniformes](example4.png)
+![Solução final – 20 cidades uniformes](example4.gif)
 
 ---
 
@@ -74,4 +74,4 @@ Foram utilizados **C++** para o algoritmo e **Signalsmith Plot** + **FFmpeg** pa
 |      75 |          129.1  |           123.6  |      1,260 |
 |     100 | **121.4**       | **116.9**        |      1,680 |
 
-![Solução final – 40 cidades uniformes](example3.png)
+![Solução final – 40 cidades uniformes](example3.gif)
