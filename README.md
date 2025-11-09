@@ -9,7 +9,7 @@ Foram utilizados **C++** para o algoritmo e **Signalsmith Plot** + **FFmpeg** pa
 - **Seleção por roleta** proporcional ao fitness.  
 - **Cruzamento Order Crossover (OX)** — preserva ordem relativa.  
 - **Mutação por troca (swap)** com taxa configurável.  
-- **Função de aptidão**: `1 / distância_total` (euclidiana).  
+- **Função de aptidão**: a aptidão é calculada a partir da transformação das distâncias por (maxDistance - distância_total) e os valores são normalizados para somar 1.  
 - **Dois cenários**: pontos uniformes e círculo (benchmark).
 
 ---
@@ -27,12 +27,19 @@ Foram utilizados **C++** para o algoritmo e **Signalsmith Plot** + **FFmpeg** pa
 
 ### Representação do Gene e Cruzamento
 - **Gene**: Vetor de `Point` representando permutação da ordem de visita.  
-- **Cruzamento**: **Order Crossover (OX)** — seleciona segmento do pai 1 e completa com ordem relativa do pai 2.  
+- **Cruzamento**: **Order Crossover (OX)** — seleciona segmento do pai 1 e completa com ordem relativa do pai 2. Ocorre 70% das vezes.  
 - **Justificativa**: Garante filhos válidos (sem duplicatas) e preserva blocos de cidades próximas.
 
 ### Função de Aptidão
-- **Fórmula**: `fitness = 1 / distância_total_euclidiana`.  
-- **Justificativa**: Maximiza qualidade ao minimizar custo. Simples, contínua e eficaz.
+- **Fórmula (implementada no código)**: a aptidão é calculada a partir das distâncias transformadas por:
+
+  ```
+  fitness_i = (maxDistance - distance_i) / sum_j (maxDistance - distance_j)
+  ```
+
+  onde maxDistance é a maior distância total observada entre indivíduos na população. Os valores são normalizados para somar 1.
+
+**Justificativa**: Essa transformação evita divisões por zero e permite normalização direta para seleção por roleta, atribuindo maiores valores de aptidão a indivíduos com menor distância total.
 
 ---
 
@@ -46,7 +53,10 @@ Foram utilizados **C++** para o algoritmo e **Signalsmith Plot** + **FFmpeg** pa
 - **Arch / Manjaro**:
   ```bash
   sudo pacman -S ffmpeg
-
+- **Ubuntu / Debian**:
+  ```bash
+  sudo apt-get install ffmpeg
+  ```
 
 ## Resultados e Desempenho
 
