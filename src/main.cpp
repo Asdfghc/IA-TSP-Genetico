@@ -26,7 +26,7 @@ int main() {
         cities = generateCirclePoints(20, 8.0, 8.0, 6.0);
         generations = 60;
     } else {
-        cities = generateUniformPoints(20);
+        cities = generateUniformPoints(40);
         generations = 100;
     }
 
