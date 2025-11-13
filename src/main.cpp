@@ -12,9 +12,9 @@ using namespace std;
 int main() {
     clearPlots();
 
-    int populationSize = 10;
+    int populationSize = 100;
     double crossoverRate = 0.7;
-    double mutationRate = 0.3;
+    double mutationRate = 0.43;
     int generations = 100;
 
     vector<Point> cities;
@@ -24,10 +24,8 @@ int main() {
 
     if (circle) {
         cities = generateCirclePoints(20, 8.0, 8.0, 6.0);
-        generations = 60;
     } else {
-        cities = generateUniformPoints(40);
-        generations = 100;
+        cities = generateUniformPoints(20);
     }
 
     Population population(populationSize);
